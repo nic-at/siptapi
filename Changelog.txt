@@ -1,0 +1,170 @@
+Version 0.3.23
+==============
+- Set Address to the SIPTAPI line number in TSPI_lineGetAddressCaps
+- Do not log string-parameters when entering TSPI_ functions as there is a Unicode/ANSI/MultiByteChar
+  confusion which may crash during conversion. Now, Debug versions should work fine again.
+
+Version 0.3.22
+==============
+- Add CalledID Info from To header
+
+Version 0.3.21
+==============
+- call eXosip_event_wait() without lock, as this holds the lock almost always.
+  Due to that, the Release build was slow as it almost never obtained the lock.
+- Check eXosip context before allocateing memory to avoid multiple allocations
+
+Version 0.3.20
+==============
+- As build time option an "DOMAINSUFFIX" can be added. This forces the SIP domain and
+  the outbound proxy to end with "DOMAINSUFFIX". If the domain already contains the
+  suffix, the DOMAINSUFFIX will not be appended.
+- Set Version Text in Config Dialog dynamically
+- GUI: "Line X" instead of "Settings Line X", to have more space once I reformat the GUI
+
+Version 0.3.19
+==============
+- Add a backup-logic to identify the correct TAPI line for incoming INVITE requests without
+  line=... parameter in the request-URI (If the SIP server does buggy NAT traversal, the line=
+  parameter may not show up in incoming R-RURI). Now, also the username in the incoming RURI is
+  checked. Note: This may select the wrong TAPI line if multiple TAPI lines use the same username.
+
+- use string::c_str() instead of string::data()
+
+Version 0.3.18
+==============
+- update osip/eXosip to version 4.1 to fix problems with registration intervalls < 100 seconds.
+  eXosip now allows expire values > 30 seconds
+- align SIPTAPI to the new API of eXosIP 4
+
+Version 0.3.17
+==============
+- add "SIPTAPI_0.3" to logging
+
+Version 0.3.16
+==============
+- Fix incoming call indication in Windows 8 64bit. Change parameters of
+  callback function from DWORD to DWORD_PTR as suggested in this thread:
+  http://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/1d9646d9-ea18-4bfa-8214-d017cab97d56/windows-8-tapi-issues?forum=windowsgeneraldevelopmentissues
+  and
+  http://msdn.microsoft.com/en-us/library/windows/desktop/ms725228%28v=vs.85%29.aspx
+
+
+Version 0.3.15
+==============
+- If during TapiLine->shutdown() the shutdown_nowait() fails (due to fail of 
+  eXosip_call_terminate(ctx, )), report asynch completion.
+- Fixed disabling of reverse-mode/ACD-mode
+
+
+Version 0.3.14
+==============
+- Inverse the "disable realm" feature. It is now called
+  "enable realm check for authentication". Default (not checked) means that the realm
+  in the authentication header need not match the user's SIP domain. This is more "plug and play"
+  as many SIP-PBX/Server use a realm which is different to the SIP domain.
+- New feature "Send 180 Ringing". When activated, SIPTAPI will respond to incoming 
+  INVITEs (incoming call indication) with 180 Ringing. This is a workaround for SIP-Server
+  which gets confused by SIPTAPI only sending "101".
+- Change the prototype of the call-back function on incoming calls from DWORD to DWORD_PTR.
+  This fixes the incoming call issue with Windows 8. For details see:
+  http://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/1d9646d9-ea18-4bfa-8214-d017cab97d56/windows-8-tapi-issues
+- Add "reverse-mode" feature. (ACD-mode and reverse-mode are mutual exclusive)
+  - Normal mode: The local phone gets called, and on ANSWER, the phone gets 
+    refered to the actual target
+  - Reverse mode: The actual target gets called, and on ANSWER, the target 
+    gets refered to the local phone
+  - ACD mode: The actual target gets called, and on ANSWER nothing happens. The 
+    TAPI application must initiate a blind transfer to transfer the call to a local phone extension.
+
+Version 0.3.13
+==============
+- Allow configuration of more than 40 lines by direct configuration in the 
+  Registry: HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Telephony\SIPTAPI
+  See file "SIPTAPI Line Configuration via Registry.txt" for details
+
+Version 0.3.12
+==============
+- proper NOTIFY handling (check sipfrag)
+- signal line-state events only once per state
+- SIP over TCP support
+
+Version 0.3.11
+==============
+- updated osip/eXosip to 3.5.0
+- added auto-answer: add header to indicate to phone that it should answer the call
+  SNOM: http://asterisk.snom.com/index.php/Asterisk_1.4/Intercom
+    Call-Info: <sip:127.0.0.1>;answer-after=0");
+  Polycom: http://www.voip-info.org/wiki/view/Polycom+auto-answer+config
+    Alert-Info: Ring Answer
+
+Version 0.3.10
+==============
+- allow to specify the phone's extension with domain (e.g. use name@127.0.0.1 to workaround a bug in Xlite/Bria)
+- enabled code for Reason header support (requires eXosip/osip git newer than 2011-01-01)
+- uses osip/eXosip from git from 2011-01-03
+
+Version 0.3.9
+=============
+- code preparations for Reason header (show incoming calls as answered)
+- update registry path to work around permission issues in Vista and Win7:
+    Software\\IPCom\\SIPTAPI --> SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Telephony\\SIPTAPI
+    Software\\IPCom\\SIPTAPI-ACD --> SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Telephony\\SIPTAPI-ACD
+
+Version 0.3.8
+=============
+- extend to 40 lines
+- try 300 UDP ports to open for SIP until fail
+- report LINECALLFEATURE_DROP in TSPI_lineGetCallStatus, allow to cancel outgoing call with dialers which query the supported commands
+- successfully tested incoming and outgoing calls with comtech's CRM/ERP system com(organize)
+- added "ACD mode" for ACD dialers (e.g. Grutzeck's "overdialer"): calls first the to be dialed target and then manually requests a blindTransfer to an agent
+
+Version 0.3.7
+=============
+- SIP User Agent header zeigt die SIPTAPI und eXosip Version an
+- make SIPTAPI work with Lotus Organizer (backport from sourceforge siptapi)
+- outboundproxy is always a loose router (automatically add ;lr parameter)
+- change registry location of configuration storage. If you update SIPTAPI just
+  rename HKEY_LOCAL_MACHINE\SOFTWARE\enum.at\SipTapi to HKEY_LOCAL_MACHINE\SOFTWARE\IPCom\SIPTAPI
+- updated osip and eXosip to version 3.3.0
+- fixed copyrights: replaced "enum.at" with "IPCom GmbH"
+- commented unused code
+- reworked SIPTAPI-Installer
+- cleaned up doc\ directory
+
+Version 0.3.6
+=============
+- bugfix in SIPTAPI: hangup geht nun schneller EXOSIP_CALL_RELEASE event dauert 15-30 Sekunden, nicht mehr darauf warten.
+
+Version 0.3.5
+=============
+- bugfix: problems when TAPI reused htCall handles as we use this also as the hdCall handle and it was not set to 0 (TSPI_lineCloseCall)
+
+Version 0.3.4
+=============
+- new option in GUI: disable realm check (in eXosip_add_authentication_info(ctx, ) set realm to 0 to allow realm differ from domain)
+
+Version 0.3.3
+=============
+- bugfixing
+
+Version 0.3.2
+=============
+- support for incoming call indication (calls can not be accepted via TAPI - only indication)
+- changed adding authetnication info to eXosip to work with incoming call identification (REGISTER)
+
+Version 0.3.1
+=============
+- fixed some bugs
+
+Version 0.3.0
+=============
+- complete rewrite of the SIPTAPI
+- new class design, only the TAPI interace is still used from asttapi
+- multiline capable, thus SIPTAI can be used in terminal server environments too
+
+Version 0.2.x
+=============
+- released on sourceforge.net
+- removed Asterisk stuff from asttapi and added eXosip
+

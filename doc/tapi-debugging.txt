@@ -1,0 +1,36 @@
+From: http://social.msdn.microsoft.com/Forums/windowsdesktop/en-US/1d9646d9-ea18-4bfa-8214-d017cab97d56/windows-8-tapi-issues?forum=windowsgeneraldevelopmentissues
+
+
+... you could enable tracing for 'tapisrv' by executing the following in a command window:
+ "netsh ras set tracing tapisrv enable".
+ 
+Then try your inbound call. The trace log will be located in %SystemRoot%\tracing\tapisrv.LOG.
+When operating correctly (within the context of XP/Windows 7), the following line entries would be recorded.
+NOTE: The two LineEventProcSP' entries are the two LINEEVENT messages that TSP generates to TAPI
+  ( a.) LINE_NEWCALL and (b.) LINE_CALLSTATE
+when handling an inbound call.
+
+[4984] 15:46:18:464: [INFO ] LineEventProcSP: HTapiLine=0000000000010300, HTapiCall=0000000000000000, msg=1f4,       P1=x5f48790, P2=x5f487b0, P3=x0
+[4984] 15:46:18:464: [TRACE] LineEventProc
+[4984] 15:46:18:464: [TRACE] CreatetCall: enter, ptLine=0000000005025B30
+[4984] 15:46:18:464: [INFO ] CreatetCall: calling NewObject ptCall 0000000005025C50
+[4984] 15:46:18:464: [TRACE] CreatetCall: NewObject returned 0x101ee
+[4984] 15:46:18:464: [TRACE] CreatetCall: exit, new ptCall=0000000005025C50
+[4984] 15:46:18:464: [INFO ] LineEventProcSP: HTapiLine=0000000000010300, HTapiCall=00000000000101EE, msg=2, P1=x2, P2=x1, P3=x0
+
+When not working on Windows 8, a trace looks like:
+
+[3344] 15:37:25:615: [INFO ] LineEventProcSP: HTapiLine=00000000000103BB, HTapiCall=0000000000000000, msg=1f4, P1=x187b06c0, P2=x187b06e0, P3=x0
+[3344] 15:37:25:615: [TRACE] LineEventProc
+[3344] 15:37:25:615: [TRACE] CreatetCall: enter, ptLine=000000EA18125250
+[3344] 15:37:25:615: [INFO ] CreatetCall: calling NewObject ptCall 000000EA18125370
+[3344] 15:37:25:615: [TRACE] CreatetCall: NewObject returned 0x10322
+[3344] 15:37:25:615: [TRACE] CreatetCall: exit, new ptCall=000000EA18125370
+[3344] 15:37:25:662: [TRACE] DestroytCall: enter, ptCall=x000000EA18125370
+
+The tapisrv is killing the call immediately after creation.
+
+Also note that when finished testing, you need to turn tracing off by executing the following in a command window:
+ "netsh ras set tracing tapisrv disable"
+
+

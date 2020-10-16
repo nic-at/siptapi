@@ -1,0 +1,21 @@
+If you want to use Outlook 2007/2010 with TAPI you have 
+to make sure to not use Office Communicator, otherwise Outlook 
+tries to initiate the call via Office Communicator instead of TAPI.
+
+In short, to use Outlook 2007/2010 with TAPI you have to (untested):
+1. Add the following key to the registry:
+    HKEY_LOCAL_MACHINE\Software\Microsoft\Office\Outlook\Call Integration
+
+2. Add the dword-value TAPIOVERRIDE and set it to 1
+
+3. Restart Outlook. 
+
+If you are using 64bit version of Windows/Outlook try the following key instead (or create both keys):
+
+    HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Office\Outlook\Call Integration
+
+
+
+For more details please refer to:
+http://social.technet.microsoft.com/Forums/en-US/office2010/thread/b85aa37b-6360-4f9e-b478-19cf755a85e7
+http://support.microsoft.com/kb/959625/

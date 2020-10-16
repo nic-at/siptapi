@@ -1,0 +1,81 @@
+Introduction
+------------
+
+Since SIPTAPI version 0.3.13 SIPTAPI allows to configure more than 40 lines. 
+This is achieved by configuring the lines directly in the Registry instead of 
+using the SIPTAPI configuration dialog.
+
+To configure more than 40 lines go to the SIPTAPI configuration (Control Panel 
+-> Telephone and Modem -> Advanced), activate the checkbox "configure lines 
+via Windows Registry" and clock "OK".
+
+Once this feature is activated, the line configuration must done manually by 
+manipulating the Windows registry. The global SIPTAPI settings "use TCP", 
+"ACD mode" and "disable realm check" can still be configured via the SIPTAPI 
+configuration dialog. (Actually the first 40 lines can always be configured via 
+the GUI by toggling the "configure line via Windows Registry" checkbox.)
+
+Registry Configuration
+----------------------
+
+SIPTAPI stores it's configuration (global and line settings) in the Registry key:
+HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Telephony\SIPTAPI
+
+Inside this key the following parameters are used:
+
+Global parameters:
+  - transportprotocol: The transport protocol used for the SIP signaling, 0 for 
+    UDP, 1 for TCP
+  - disablerealmcheck: SIP authentication (HTTP digest authentication) uses a 
+    realm, which is the context for the username/password. Usually the realm 
+    is identical to the SIP domain. If this is not the case (e.g. when using
+    Asterisk with default settings) then activate this setting to allow
+    authentication also against non-matching realms. In local environments it
+    is usally fine to activate this feature. 0 to enforce realm check, 1 to disable 
+    the realm check
+  - lineconfigviaregistry: 0 for GUI configuration, 1 for configuration via Registry
+  - numLines: The number of available lines which SIPTAPI shall report to Windows TAPI. 
+    This parameter is only used when lineconfigviaregistry = 1
+  - reversemode: ACD mode. In this mode SIPTAPI calls first to target and then refers
+    the call to the local user. Useful in outbound call center applications. Note: Do
+    not enable this feature unless you know what you are doing! 0 for normal
+    (preferred) signaling, 1 for ACD mode.
+
+Line parameters: Every line parameter has its respective line number as suffix. 
+There is no limit on the number of lines. Line numbers start with 1 and must not
+contain leading zeros.
+ - proxy: SIP domain, without "sip:"
+ - obproxy: (optional) Outbound Proxy, without "sip:"
+ - username: SIP username of the SIP account used by SIPTAPI
+ - password: SIP password of the SIP account used by SIPTAPI
+ - authusername: (optional) SIP authentication user, only needed if different than the username
+ - phoneusername: (optional) If SIPTAPI uses a dedicated SIP account provide here the username
+   (extension) of the user's SIP phone.
+ - lineactive: flag to enable/disable a line. 0 is disabled, 1 is enabled
+ - register: flag to indicate if SIPTAPI REGISTERs to the proxy. Needed for example if inbound
+   call indication is required. 0 do not REGISTER, 1 to REGISTER
+ - autoanswer: SIPTAPI can add SIP headers to indicate to the PBX/phone to auto answer the call
+   initiated by SIPTAPI. Some phones (SNOM, Polycom, Jitsi) support this feature. 0 for normal 
+   behavior, 1 to add these headers.
+
+
+See below or the file "SIPTAPI Line Configuration via Registry.reg" for examples of
+Registry files to import settings:
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Telephony\SIPTAPI]
+"transportprotocol"=dword:00000000
+"disablerealmcheck"=dword:00000001
+"lineconfigviaregistry"=dword:00000001
+"numLines"=dword:00000003
+"reversemode"=dword:00000000
+
+"proxy3"="example.com"
+"obproxy3"="sip.example.com:5072"
+"username3"="user3"
+"password3"="topsecret3"
+"authusername3"=""
+"phoneusername3"=""
+"lineactive3"=dword:00000001
+"register3"=dword:00000001
+"autoanswer3"=dword:00000000
+
