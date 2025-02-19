@@ -1,3 +1,8 @@
+NOTE: If SIPTAPI fails after upgrading to Windows 11, please reinstall SIPTAPI:
+uninstall + install in telephony control panel (if that does not help, uninstall,
+remove the c:\windows\system32\siptapi* files using Windows Explorer, reboot, put the
+siptapi* files back to c:\windows\system32\siptapi* files using Windows Explorer, install)
+
 This multiline verision of SIPTAPI is essentially an improved version
 of the original Source-Forge SIPTAPI. It requires REFER support on the SIP side to
 work properly - but it is stable and tested with various SIP phones
